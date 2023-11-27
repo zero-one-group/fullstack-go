@@ -1,3 +1,5 @@
 fullstack-go
 
 tmp/
+vendor/
+build/
