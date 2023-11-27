@@ -19,7 +19,8 @@ type envars struct {
 		Name        string `env:"DB_NAME,required"`
 		Username    string `env:"DB_USERNAME,required"`
 		Password    string `env:"DB_PASSWORD,required"`
-		AutoMigrate bool   `env:"DATABASE_AUTO_MIGRATE,default=false,strict"`
+		SSLMode     string `env:"DB_SSL_MODE,default=disable,strict"`
+		AutoMigrate bool   `env:"DB_AUTO_MIGRATE,default=false,strict"`
 	}
 	Email struct {
 		Provider     string `env:"EMAIL_PROVIDER"` // possible values: smtp, postmark, awsses
