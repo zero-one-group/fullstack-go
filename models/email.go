@@ -8,17 +8,15 @@ import (
 
 const (
 	// DefaultSender is the default email address to send emails from.
-	DefaultSender = "info@zero-one-group.com"
+	DefaultSender = "support@lenslocked.com"
 )
 
-type EmailService struct {
-	// DefaultSender is used as the default sender when one isn't provided for an
-	// email. This is also used in functions where the email is a predetermined,
-	// like the forgotten password email.
-	DefaultSender string
-
-	// unexported fields
-	dialer *mail.Dialer
+type Email struct {
+	From      string
+	To        string
+	Subject   string
+	Plaintext string
+	HTML      string
 }
 
 type SMTPConfig struct {
@@ -35,19 +33,19 @@ func NewEmailService(config SMTPConfig) *EmailService {
 	return &es
 }
 
-type Email struct {
-	From      string
-	To        string
-	Subject   string
-	Plaintext string
-	HTML      string
+type EmailService struct {
+	// DefaultSender is used as the default sender when one isn't provided for an
+	// email. This is also used in functions where the email is a predetermined,
+	// like the forgotten password email.
+	DefaultSender string
+
+	// unexported fields
+	dialer *mail.Dialer
 }
 
 func (es *EmailService) Send(email Email) error {
-
 	msg := mail.NewMessage()
 	msg.SetHeader("To", email.To)
-	// This is the updated line
 	es.setFrom(msg, email)
 	msg.SetHeader("Subject", email.Subject)
 	switch {
@@ -66,19 +64,6 @@ func (es *EmailService) Send(email Email) error {
 	return nil
 }
 
-func (es *EmailService) setFrom(msg *mail.Message, email Email) {
-	var from string
-	switch {
-	case email.From != "":
-		from = email.From
-	case es.DefaultSender != "":
-		from = es.DefaultSender
-	default:
-		from = DefaultSender
-	}
-	msg.SetHeader("From", from)
-}
-
 func (es *EmailService) ForgotPassword(to, resetURL string) error {
 	email := Email{
 		Subject:   "Reset your password",
@@ -91,4 +76,21 @@ func (es *EmailService) ForgotPassword(to, resetURL string) error {
 		return fmt.Errorf("forgot password email: %w", err)
 	}
 	return nil
+}
+
+// Used to set the sender of the message. The priority is:
+//   - email.From
+//   - EmailService.DefaultSender
+//   - DefaultSender (package const)
+func (es *EmailService) setFrom(msg *mail.Message, email Email) {
+	var from string
+	switch {
+	case email.From != "":
+		from = email.From
+	case es.DefaultSender != "":
+		from = es.DefaultSender
+	default:
+		from = DefaultSender
+	}
+	msg.SetHeader("From", from)
 }

@@ -22,8 +22,7 @@ func User(ctx context.Context) *models.User {
 	if !ok {
 		// The most likely case is that nothing was ever stored in the context,
 		// so it doesn't have a type of *models.User. It is also possible that
-		// other code in this package wrote an invalid value using the user key,
-		// so it is important to review code changes in this package.
+		// other code in this package wrote an invalid value using the user key.
 		return nil
 	}
 	return user

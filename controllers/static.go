@@ -5,14 +5,6 @@ import (
 	"net/http"
 )
 
-type Static struct {
-	Template Template
-}
-
-func (static Static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	static.Template.Execute(w, r, nil)
-}
-
 func StaticHandler(tpl Template) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tpl.Execute(w, r, nil)
@@ -34,7 +26,11 @@ func FAQ(tpl Template) http.HandlerFunc {
 		},
 		{
 			Question: "How do I contact support?",
-			Answer:   `Email us - <a href="mailto:info@zero-one-group.com">info@zero-one-group.com</a>`,
+			Answer:   `Email us - <a href="mailto:support@lenslocked.com">support@lenslocked.com</a>`,
+		},
+		{
+			Question: "Where is your office?",
+			Answer:   "Our entire team is remote!",
 		},
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
