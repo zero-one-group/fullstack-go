@@ -23,6 +23,12 @@
 					</a>
 				</div>
 				<div class="space-x-4">
+					<form action="/signout" method="post" class="inline pr-4">
+						<div class="hidden">
+							{{csrfField}}
+						</div>
+						<button type="submit">Sign out</button>
+					</form>
 					<a href="/signin">Sign in</a>
 					<a href="/signup" class="px-4 py-2 bg-blue-700 hover:bg-blue-600 rounded">
 						Sign up
