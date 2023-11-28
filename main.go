@@ -15,8 +15,6 @@ import (
 
 func main() {
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
 
 	// Setup a database connection
 	cfg := models.DefaultPostgresConfig()
@@ -45,6 +43,24 @@ func main() {
 	usersC.Templates.SignIn = views.Must(views.ParseFS(
 		templates.FS, "signin.html", "tailwind.html"))
 
+	umw := controllers.UserMiddleware{
+		SessionService: &sessionService,
+	}
+
+	csrfKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
+	csrfMw := csrf.Protect(
+		[]byte(csrfKey),
+		// TODO: Fix this before deploying
+		csrf.Secure(false),
+	)
+
+	// Setup Middleware
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+
+	r.Use(csrfMw)
+	r.Use(umw.SetUser)
+
 	// Setup our routing
 	r.Get("/", controllers.StaticHandler(
 		views.Must(views.ParseFS(templates.FS, "home.html", "tailwind.html"))))
@@ -57,7 +73,10 @@ func main() {
 
 	r.Get("/signin", usersC.SignIn)
 	r.Post("/signin", usersC.ProcessSignIn)
-	r.Get("/users/me", usersC.CurrentUser)
+	r.Route("/users/me", func(r chi.Router) {
+		r.Use(umw.RequireUser)
+		r.Get("/", usersC.CurrentUser)
+	})
 	r.Post("/signout", usersC.ProcessSignOut)
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
@@ -66,11 +85,5 @@ func main() {
 
 	fmt.Println("Starting the server on :3000...")
 
-	csrfKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
-	csrfMw := csrf.Protect(
-		[]byte(csrfKey),
-		// TODO: Fix this before deploying
-		csrf.Secure(false),
-	)
-	http.ListenAndServe(":3000", csrfMw(r))
+	http.ListenAndServe(":3000", r)
 }

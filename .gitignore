@@ -1,3 +1,7 @@
 fullstack-go
 
 tmp/
+
+.env
+
+
