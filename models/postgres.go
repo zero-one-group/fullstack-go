@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/zero-one-group/fullstack-go/config"
 )
 
 type PostgresConfig struct {
@@ -22,12 +23,12 @@ func (cfg PostgresConfig) String() string {
 
 func DefaultPostgresConfig() PostgresConfig {
 	return PostgresConfig{
-		Host:     "localhost",
-		Port:     "5432",
-		User:     "pengguna",
-		Password: "jagosekali",
-		Database: "zog",
-		SSLMode:  "disable",
+		Host:     config.Env.Database.Host,
+		Port:     config.Env.Database.Port,
+		User:     config.Env.Database.Username,
+		Password: config.Env.Database.Password,
+		Database: config.Env.Database.Name,
+		SSLMode:  config.Env.Database.SSLMode,
 	}
 }
 

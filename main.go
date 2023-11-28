@@ -1,12 +1,13 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/csrf"
+	"github.com/zero-one-group/fullstack-go/config"
 	"github.com/zero-one-group/fullstack-go/controllers"
 	"github.com/zero-one-group/fullstack-go/models"
 	"github.com/zero-one-group/fullstack-go/templates"
@@ -64,13 +65,12 @@ func main() {
 		http.Error(w, "Page not found", http.StatusNotFound)
 	})
 
-	fmt.Println("Starting the server on :3000...")
+	log.Printf("Starting the server on %s...", config.Env.BindAddress)
 
-	csrfKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
 	csrfMw := csrf.Protect(
-		[]byte(csrfKey),
+		[]byte(config.Env.CSRFKey),
 		// TODO: Fix this before deploying
 		csrf.Secure(false),
 	)
-	http.ListenAndServe(":3000", csrfMw(r))
+	http.ListenAndServe(config.Env.BindAddress, csrfMw(r))
 }
