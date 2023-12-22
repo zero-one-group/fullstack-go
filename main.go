@@ -159,11 +159,6 @@ func main() {
 		http.Error(w, "Page not found", http.StatusNotFound)
 	})
 
-	chi.Walk(r, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
-		fmt.Printf("[%s]: '%s' has %d middlewares\n", method, route, len(middlewares))
-		return nil
-	})
-
 	// Start the server
 	fmt.Printf("Starting the server on %s...\n", cfg.Server.Address)
 	err = http.ListenAndServe(cfg.Server.Address, r)
