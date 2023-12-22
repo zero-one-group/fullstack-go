@@ -121,10 +121,15 @@ func main() {
 		"reset-pw.html", "tailwind.html",
 	))
 
+	fs := http.FileServer(http.Dir("public/dist"))
+
 	// Set up router and routes
 	r := chi.NewRouter()
 	r.Use(csrfMw)
 	r.Use(umw.SetUser)
+
+	r.Handle("/public/*", http.StripPrefix("/public/", fs))
+
 	r.Get("/", controllers.StaticHandler(views.Must(views.ParseFS(
 		templates.FS,
 		"home.html", "tailwind.html",
