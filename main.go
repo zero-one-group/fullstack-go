@@ -121,10 +121,15 @@ func main() {
 		"reset-pw.html", "tailwind.html",
 	))
 
+	fs := http.FileServer(http.Dir("public/dist"))
+
 	// Set up router and routes
 	r := chi.NewRouter()
 	r.Use(csrfMw)
 	r.Use(umw.SetUser)
+
+	r.Handle("/public/*", http.StripPrefix("/public/", fs))
+
 	r.Get("/", controllers.StaticHandler(views.Must(views.ParseFS(
 		templates.FS,
 		"home.html", "tailwind.html",
@@ -152,6 +157,11 @@ func main() {
 	})
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Page not found", http.StatusNotFound)
+	})
+
+	chi.Walk(r, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+		fmt.Printf("[%s]: '%s' has %d middlewares\n", method, route, len(middlewares))
+		return nil
 	})
 
 	// Start the server

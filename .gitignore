@@ -4,4 +4,6 @@ tmp/
 
 .env
 
-
+bin
+node_modules
+public/dist/
